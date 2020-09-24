@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import Basic from '../views/Basic.vue'
 import Getters from '../views/Getters'
+import Mutations from '../views/Mutations'
 
 Vue.use(VueRouter)
 
@@ -29,6 +30,10 @@ const routes = [
     path: '/getters',
     name: 'Getters',
     component: Getters
+  },
+  {
+    path: '/mutations',
+    component: Mutations
   }
 ]
 

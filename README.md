@@ -77,7 +77,7 @@ computed: {
 Components Can Still Have Local State (Don't see why that would be a good idea though..)
 Using Vuex doesn't mean you should put all the state in Vuex. Although putting more state into Vuex makes your state mutations more explicit and debuggable, sometimes it could also make the code more verbose and indirect. If a piece of state strictly belongs to a single component, it could be just fine leaving it as local state. You should weigh the trade-offs and make decisions that fit the development needs of your app.
 
-Getters (Essentially computed properties for stores)
+# Getters (Essentially computed properties for stores)
 You can set these instead of computed if you have say repeated computed properties in multiple components. Remember computed and getters are NOT for setting state, but just returning things based on data/state. a good example would be if we needed to count the amount of todos done in various components.
 We would have to repeat this multiple times
 ```
@@ -130,7 +130,7 @@ computed: {
 ```
 Note that getters accessed as properties are cached as part of Vue's reactivity system.
 
-Method-Style Access
+# Method-Style Access
 You can also pass arguments to getters by returning a function. This is particularly useful when you want to query an array in the store:
 ```
 getters: {
@@ -169,4 +169,145 @@ If you want to map a getter to a different name, use an object:
   // map `this.doneCount` to `this.$store.getters.doneTodosCount`
   doneCount: 'doneTodosCount'
 })
+```
+
+# Mutations
+The only way to actually change state in a Vuex store is by committing a mutation. Vuex mutations are very similar to events: each mutation has a string type and a handler. The handler function is where we perform actual state modifications, and it will receive the state as the first argument:
+
+- As in Redux always initialize your store's initial state with all desired fields upfront.
+
+
+```
+const store = new Vuex.Store({
+  state: {
+    count: 1
+  },
+  mutations: {
+    increment (state) {
+      // mutate state
+      state.count++
+    }
+  }
+})
+```
+You cannot directly call a mutation handler. Think of it more like event registration: "When a mutation with type increment is triggered, call this handler." To invoke a mutation handler, you need to call store.commit with its type:
+```
+store.commit('increment')
+```
+
+# Commit with Payload
+You can pass an additional argument to store.commit, which is called the payload for the mutation:
+```
+// ...
+mutations: {
+  increment (state, n) {
+    state.count += n
+  }
+}
+```
+```
+store.commit('increment', 10)
+```
+In most cases, the payload should be an object so that it can contain multiple fields, and the recorded mutation will also be more descriptive:
+```
+// ...
+mutations: {
+  increment (state, payload) {
+    state.count += payload.amount
+  }
+}
+```
+```
+store.commit('increment', {
+  amount: 10
+})
+```
+
+# Object-Style Commit
+An alternative way to commit a mutation is by directly using an object that has a type property:
+```
+store.commit({
+  type: 'increment',
+  amount: 10
+})
+```
+When using object-style commit, the entire object will be passed as the payload to mutation handlers, so the handler remains the same:
+```
+mutations: {
+  increment (state, payload) {
+    state.count += payload.amount
+  }
+}
+```
+
+# Mutations Follow Vue's Reactivity Rules
+- Prefer initializing your store's initial state with all desired fields upfront.
+
+When you have to add new properties to an Object, you should either:
+```
+Use Vue.set(obj, 'newProp', 123), or
+```
+
+Replace that Object with a fresh one. For example, using the object spread syntax we can write it like this:
+```
+state.obj = { ...state.obj, newProp: 123 }
+```
+
+# Using Constants for Mutation Types
+It is a commonly seen pattern to use constants for mutation types in various Flux implementations. This allows the code to take advantage of tooling like linters, and putting all constants in a single file allows your collaborators to get an at-a-glance view of what mutations are possible in the entire application:
+```
+// mutation-types.js
+export const SOME_MUTATION = 'SOME_MUTATION'
+```
+```
+// store.js
+import Vuex from 'vuex'
+import { SOME_MUTATION } from './mutation-types'
+
+const store = new Vuex.Store({
+  state: { ... },
+  mutations: {
+    // we can use the ES2015 computed property name feature
+    // to use a constant as the function name
+    [SOME_MUTATION] (state) {
+      // mutate state
+    }
+  }
+})
+```
+Whether to use constants is largely a preference - it can be helpful in large projects with many developers, but it's totally optional if you don't like them.
+
+
+# Mutations Must Be Synchronous
+One important rule to remember is that mutation handler functions must be synchronous. Why? Consider the following example:
+```
+mutations: {
+  someMutation (state) {
+    api.callAsyncMethod(() => {
+      state.count++
+    })
+  }
+}
+```
+Now imagine we are debugging the app and looking at the devtool's mutation logs. For every mutation logged, the devtool will need to capture a "before" and "after" snapshots of the state. However, the asynchronous callback inside the example mutation above makes that impossible: the callback is not called yet when the mutation is committed, and there's no way for the devtool to know when the callback will actually be called - any state mutation performed in the callback is essentially un-trackable!
+
+# Committing Mutations in Components
+You can commit mutations in components with this.$store.commit('xxx'), or use the mapMutations helper which maps component methods to store.commit calls (requires root store injection):
+```
+import { mapMutations } from 'vuex'
+
+export default {
+  // ...
+  methods: {
+    ...mapMutations([
+      'increment', // map `this.increment()` to `this.$store.commit('increment')`
+
+      // `mapMutations` also supports payloads:
+      'incrementBy' // map `this.incrementBy(amount)` to `this.$store.commit('incrementBy', amount)`
+    ]),
+    ...mapMutations({
+      add: 'increment' // map `this.add()` to `this.$store.commit('increment')`
+    })
+  }
+}
 ```

@@ -5,7 +5,7 @@
       <router-link to="/basic">Basic</router-link> |
       <router-link to="/about">About</router-link> |
       <router-link to="/getters">Getters</router-link> |
-
+      <router-link to="/mutations">Mutations</router-link> |
     </div>
     <router-view/>
   </div>
