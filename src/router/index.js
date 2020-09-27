@@ -2,7 +2,6 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import Basic from '../views/Basic.vue'
-import Getters from '../views/Getters'
 import Mutations from '../views/Mutations'
 import Actions from '../views/Actions'
 import Modules from '../views/Modules'
@@ -30,9 +29,10 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
   },
   {
+    // setting chunk name - now getters.js will only be loaded once we hit the page, look in sources and see when hitting the page
     path: '/getters',
     name: 'Getters',
-    component: Getters
+    component: () => import(/* webpackChunkName: "getters" */ '../views/Getters.vue')
   },
   {
     path: '/mutations',
