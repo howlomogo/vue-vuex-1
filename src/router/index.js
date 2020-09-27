@@ -4,6 +4,9 @@ import Home from '../views/Home.vue'
 import Basic from '../views/Basic.vue'
 import Getters from '../views/Getters'
 import Mutations from '../views/Mutations'
+import Actions from '../views/Actions'
+import Modules from '../views/Modules'
+import FormHandling from '../views/FormHandling'
 
 Vue.use(VueRouter)
 
@@ -34,6 +37,18 @@ const routes = [
   {
     path: '/mutations',
     component: Mutations
+  },
+  {
+    path: '/actions',
+    component: Actions
+  },
+  {
+    path: '/modules',
+    component: Modules
+  },
+  {
+    path: '/form-handling',
+    component: FormHandling
   }
 ]
 

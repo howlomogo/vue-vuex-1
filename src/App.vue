@@ -6,6 +6,9 @@
       <router-link to="/about">About</router-link> |
       <router-link to="/getters">Getters</router-link> |
       <router-link to="/mutations">Mutations</router-link> |
+      <router-link to="/actions">Actions</router-link> |
+      <router-link to="/modules">Modules</router-link> |
+      <router-link to="/form-handling">Form Handling</router-link>
     </div>
     <router-view/>
   </div>

@@ -32,6 +32,7 @@ export default {
         ])
 
         // !!!Look more into this!!!, but it does seem possible to do it as below, keep it simple for now
+        // Check what the standard way of doing this is.
         // ...mapMutations({
         //     increment2: function(commit, payload) {
         //         commit('increment2', payload )
